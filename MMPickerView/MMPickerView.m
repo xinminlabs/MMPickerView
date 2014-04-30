@@ -39,6 +39,7 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
 @property (nonatomic, assign) BOOL pickerViewShowsSelectionIndicator;
 @property (copy) void (^onDismissCompletion)(NSString *);
 @property (copy) NSString *(^objectToStringConverter)(id object);
+@property (copy) NSString *(^objectToImageUrlConverter)(id object);
 
 @end
 
@@ -61,13 +62,7 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
                 withOptions:(NSDictionary *)options
                  completion:(void (^)(NSString *))completion{
   
-  [[self sharedView] initializePickerViewInView:view
-                                      withArray:strings
-                                    withOptions:options];
-  
-  [[self sharedView] setPickerHidden:NO callBack:nil];
-  [self sharedView].onDismissCompletion = completion;
-  [view addSubview:[self sharedView]];
+    [self showPickerViewInView:view withObjects:strings withOptions:options objectToStringConverter:nil objectToImageUrlConverter:nil completion:completion];
   
 }
 
@@ -77,14 +72,26 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
     objectToStringConverter:(NSString *(^)(id))converter
                  completion:(void (^)(id))completion {
   
-  [self sharedView].objectToStringConverter = converter;
-  [self sharedView].onDismissCompletion = completion;
-  [[self sharedView] initializePickerViewInView:view
-                                      withArray:objects
-                                    withOptions:options];
-  [[self sharedView] setPickerHidden:NO callBack:nil];
-  [view addSubview:[self sharedView]];
+    [self showPickerViewInView:view withObjects:objects withOptions:options objectToStringConverter:converter objectToImageUrlConverter:nil completion:completion];
   
+}
+
++(void)showPickerViewInView:(UIView *)view
+                withObjects:(NSArray *)objects
+                withOptions:(NSDictionary *)options
+    objectToStringConverter:(NSString *(^)(id))stringConverter
+  objectToImageUrlConverter:(NSString *(^)(id))imageUrlConverter
+                 completion:(void (^)(id))completion {
+    
+    [self sharedView].objectToStringConverter = stringConverter;
+    [self sharedView].objectToImageUrlConverter = imageUrlConverter;
+    [self sharedView].onDismissCompletion = completion;
+    [[self sharedView] initializePickerViewInView:view
+                                        withArray:objects
+                                      withOptions:options];
+    [[self sharedView] setPickerHidden:NO callBack:nil];
+    [view addSubview:[self sharedView]];
+    
 }
 
 #pragma mark - Dismiss Methods
@@ -326,7 +333,7 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
            reusingView:(UIView *)view {
   
   UIView *customPickerView = view;
-  
+  UIImageView *imageView;
   UILabel *pickerViewLabel;
   
   if (customPickerView==nil) {
@@ -334,9 +341,9 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
     CGRect frame = CGRectMake(0.0, 0.0, 292.0, 44.0);
     customPickerView = [[UIView alloc] initWithFrame: frame];
     
-//   UIImageView *patternImageView = [[UIImageView alloc] initWithFrame:frame];
-//   patternImageView.image = [[UIImage imageNamed:@"texture"] resizableImageWithCapInsets:UIEdgeInsetsZero];
-//    [customPickerView addSubview:patternImageView];
+    CGRect imageFrame = CGRectMake(10.0, 2.0, 50.0, 42.0);
+    imageView = [[UIImageView alloc] initWithFrame:imageFrame];
+    [customPickerView addSubview:imageView];
     
     if (_yValueFromTop == 0.0f) {
       _yValueFromTop = 3.0;
@@ -364,6 +371,12 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
     [pickerViewLabel setText: [_pickerViewArray objectAtIndex:row]];
   } else{
     [pickerViewLabel setText:(self.objectToStringConverter ([_pickerViewArray objectAtIndex:row]))];
+
+      if (self.objectToImageUrlConverter) {
+        NSURL *imageUrl = [NSURL URLWithString:(self.objectToImageUrlConverter ([_pickerViewArray objectAtIndex:row]))];
+        UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageUrl]];
+        imageView.image = image;
+      }
   }
   
   return customPickerView;
