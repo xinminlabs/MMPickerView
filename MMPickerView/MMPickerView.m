@@ -349,7 +349,7 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
       _yValueFromTop = 3.0;
     }
     
-    CGRect labelFrame = CGRectMake(0.0, _yValueFromTop, 292.0, 35); // 35 or 44
+    CGRect labelFrame = CGRectMake(30.0, _yValueFromTop, 292.0, 35); // 35 or 44
     pickerViewLabel = [[UILabel alloc] initWithFrame:labelFrame];
     [pickerViewLabel setTag:1];
     [pickerViewLabel setTextAlignment: _pickerViewTextAlignment];
