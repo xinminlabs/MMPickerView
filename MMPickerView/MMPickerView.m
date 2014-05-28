@@ -323,6 +323,10 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
   }
 }
 
+- (CGFloat)pickerView:(UIPickerView *)pickerView rowHeightForComponent:(NSInteger)component {
+    return 100;
+}
+
 - (id)selectedObject {
   return [_pickerViewArray objectAtIndex: [self.pickerView selectedRowInComponent:0]];
 }
@@ -338,10 +342,10 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
   
   if (customPickerView==nil) {
     
-    CGRect frame = CGRectMake(0.0, 0.0, 292.0, 44.0);
+    CGRect frame = CGRectMake(0.0, 0.0, 292.0, 84.0);
     customPickerView = [[UIView alloc] initWithFrame: frame];
     
-    CGRect imageFrame = CGRectMake(10.0, 2.0, 50.0, 42.0);
+    CGRect imageFrame = CGRectMake(10.0, 2.0, 90.0, 82.0);
     imageView = [[UIImageView alloc] initWithFrame:imageFrame];
     [customPickerView addSubview:imageView];
     
@@ -349,7 +353,7 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
       _yValueFromTop = 3.0;
     }
     
-    CGRect labelFrame = CGRectMake(30.0, _yValueFromTop, 292.0, 35); // 35 or 44
+    CGRect labelFrame = CGRectMake(70.0, _yValueFromTop, 252.0, 75); // 35 or 44
     pickerViewLabel = [[UILabel alloc] initWithFrame:labelFrame];
     [pickerViewLabel setTag:1];
     [pickerViewLabel setTextAlignment: _pickerViewTextAlignment];
